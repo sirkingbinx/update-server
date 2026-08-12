@@ -25,3 +25,31 @@ node index.js
 # test to confirm that it's working
 curl -s http://localhost:1552/version/nametags
 ```
+
+## Service Config
+I do this personally so I don't have to bother with leaving a terminal open. This assumes you're using systemd, figure it out if you're not
+```bash
+# make sure you're in your dir containing the update server
+service_text="[Unit]
+Description=Update Server (TCP 1552)
+After=network.target
+
+[Service]
+Type=simple
+User=$(whoami)
+WorkingDirectory=$(pwd)
+ExecStart=$(which node) index.js
+Restart=always
+RestartSec=10
+SyslogIdentifier=updateserver
+Environment=NODE_ENV=production PORT=1552
+
+[Install]
+WantedBy=multi-user.target"
+
+sudo echo "$service_text" | sudo tee /etc/systemd/system/updateserver.service
+
+sudo systemctl daemon-reload
+sudo systemctl start updateserver
+sudo systemctl enable updateserver
+```
