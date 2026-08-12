@@ -1,0 +1,10 @@
+{
+    "github_api_key": "AUTHENTICATION ALLOWS FOR MORE REQUESTS PER-HOUR",
+    "services": [
+        {
+            "service_name": "nametags",
+            "github_api_release_url": "https://api.github.com/repos/sirkingbinx/BingusNametagsPlusPlus/releases/latest",
+            "update_interval": 1800
+        }
+    ]
+}
