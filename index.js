@@ -8,7 +8,7 @@ let update_data = { };
 
 function updateServiceInformation(service) {
     let headers = {
-        "User-Agent": "github.com/sirkingbinx/UpdateService (Self-Hosted)"
+        "User-Agent": "github.com/sirkingbinx/update-service (Self-Hosted)"
     };
 
     if (services.github_api_key !== "AUTHENTICATION ALLOWS FOR MORE REQUESTS PER-HOUR" && services.github_api_key !== "") {
@@ -20,9 +20,19 @@ function updateServiceInformation(service) {
         headers: headers
     }).then(resp => 
         resp.json().then(json => {
-            update_data[service.service_name] = {
-                "version": json["tag_name"],
-                "download": json["assets"][0]["browser_download_url"]
+            try {
+                update_data[service.service_name] = {
+                    "version": json["tag_name"],
+                    "download": json["assets"][0]["browser_download_url"],
+                    "status": 200
+                }
+            } catch (err) {
+                if (update_data[service.service_name] == null) {
+                    update_data[service.service_name] = {
+                        "message": "The GitHub servers could not be contacted to update version information. The server is online and running. Please give up to 30 minutes in order for version data to update.",
+                        "status": 500
+                    }
+                }
             }
         })
     );
@@ -46,7 +56,9 @@ app.get("/version/:service_name", (req, res) => {
     }
 
     let service_info = update_data[service_name];
-    service_info.status = 200;
+
+    if (service_info.status == null)
+        service_info.status = 200;
 
     res.json(service_info)
 });
